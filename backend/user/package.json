@@ -15,14 +15,17 @@
   "license": "ISC",
   "packageManager": "pnpm@10.18.3",
   "dependencies": {
+    "amqplib": "^0.10.9",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongoose": "^8.19.1",
+    "nodemailer": "^7.0.9",
     "redis": "^5.8.3"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/express": "^5.0.3",
-    "@types/redis": "^4.0.11",
+    "@types/nodemailer": "^7.0.2",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10"
   }

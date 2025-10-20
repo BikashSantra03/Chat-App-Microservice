@@ -1,5 +1,8 @@
-import mongoose, { Document, Schema } from "mongoose";
-const userSchema = new Schema({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.User = void 0;
+var mongoose_1 = require("mongoose");
+var userSchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: [true, "Name is required"],
@@ -16,5 +19,4 @@ const userSchema = new Schema({
 }, {
     timestamps: true,
 });
-export const User = mongoose.model("User", userSchema);
-//# sourceMappingURL=User.js.map
+exports.User = mongoose_1.default.model("User", userSchema);

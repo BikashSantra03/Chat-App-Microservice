@@ -4,6 +4,7 @@ import colors from "colors";
 import connectDb from "./config/db.js";
 import connectRedis from "./config/redis.js";
 import userRouter from "./routes/user.route.js";
+import { connectRabbitMQ } from "./config/rabbitmq.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ async function startServer() {
     try {
         await connectDb();
         await connectRedis();
+        await connectRabbitMQ();
 
         const PORT = process.env.PORT || 3000;
 

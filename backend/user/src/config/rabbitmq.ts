@@ -50,6 +50,3 @@ export const publishToQueue = async (queueName: string, message: any) => {
         throw error;
     }
 };
-
-// Export channel for advanced usage (e.g., consuming messages)
-export const getChannel = () => channel;

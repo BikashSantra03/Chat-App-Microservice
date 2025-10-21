@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext", // Added for consistency
+        "target": "ESNext",
+        "types": ["node"], // Include Node.js types
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+        "strict": true,
+        "esModuleInterop": true, // For compatibility with CommonJS modules
+        "skipLibCheck": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force"
+    },
+    "include": ["src/**/*"], // Only compile files in src/
+    "exclude": ["node_modules", "dist"] // Exclude node_modules and dist/
+}

@@ -1,5 +1,5 @@
 {
-  "name": "user",
+  "name": "mail",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,13 +19,12 @@
     "colors": "^1.4.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "mongoose": "^8.19.1",
-    "redis": "^5.8.3",
-    "zod": "^4.1.12"
+    "nodemailer": "^7.0.9"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.7",
     "@types/express": "^5.0.3",
+    "@types/nodemailer": "^7.0.2",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10"
   }

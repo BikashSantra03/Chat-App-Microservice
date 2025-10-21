@@ -4,6 +4,8 @@ export interface IUser extends Document {
     _id: mongoose.Types.ObjectId;
     name: string;
     email: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const userSchema: Schema<IUser> = new Schema(

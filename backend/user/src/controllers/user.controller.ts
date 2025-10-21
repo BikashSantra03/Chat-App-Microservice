@@ -1,14 +1,21 @@
 import { z } from "zod";
+import { format } from "date-fns";
 import { redisClient } from "../config/redis.js";
 import { publishToQueue } from "../config/rabbitmq.js";
 import { generateOtp } from "../utils/generateOTP.js";
-import { loginSchema } from "../utils/validator.js";
+import { loginSchema, verifySchema } from "../utils/validator.js";
 import TryCatch from "../utils/TryCatch.js";
 import type { RequestHandler } from "express";
 import generateJwtToken from "../utils/generateJWT.js";
-import { createUser, findUserByEmail } from "../services/user.service.js";
+import {
+    createUser,
+    findUserByEmail,
+    findUserById,
+} from "../services/user.service.js";
 import type { IUser } from "../model/User.js";
+import type { AuthRequest } from "../middlewares/isAuth.js";
 
+// Login User Controller
 export const loginUser: RequestHandler = TryCatch(async (req, res) => {
     // Check if Redis client is connected
     if (!redisClient.isOpen) {
@@ -59,6 +66,7 @@ export const loginUser: RequestHandler = TryCatch(async (req, res) => {
     });
 });
 
+// Forget Password Controller
 export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
     // Check if Redis client is connected
     if (!redisClient.isOpen) {
@@ -109,15 +117,18 @@ export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
     });
 });
 
+// Verify User Controller
 export const verifyUser: RequestHandler = TryCatch(async (req, res) => {
-    const { email, otp: enteredOtp } = req.body;
-
-    // Validate input
-    if (!email || !enteredOtp) {
+    // Validate request body using Zod
+    const parsed = verifySchema.safeParse(req.body);
+    if (!parsed.success) {
         return res.status(400).json({
-            message: "Email and OTP are required",
+            message: "Validation failed",
+            errors: z.treeifyError(parsed.error),
         });
     }
+
+    const { email, otp: enteredOtp } = parsed.data;
 
     // Check OTP in Redis
     const otpKey = `otp:login:${email}`;
@@ -157,3 +168,33 @@ export const verifyUser: RequestHandler = TryCatch(async (req, res) => {
         token,
     });
 });
+
+// Get My Profile Controller
+export const getMyProfile: RequestHandler = TryCatch(
+    async (req: AuthRequest, res) => {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "Not authenticated",
+            });
+        }
+        // Fetch user by ID
+        const user = await findUserById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Return user profile
+        return res.json({
+            message: "Profile retrieved successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                createdAt: format(user.createdAt, "dd-MM-yyyy"),
+            },
+        });
+    }
+);

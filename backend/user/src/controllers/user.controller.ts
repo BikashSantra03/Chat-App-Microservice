@@ -1,10 +1,13 @@
 import { z } from "zod";
 import { redisClient } from "../config/redis.js";
 import { publishToQueue } from "../config/rabbitmq.js";
-import { generateOtp } from "../hooks/generateOTP.js";
+import { generateOtp } from "../utils/generateOTP.js";
 import { loginSchema } from "../utils/validator.js";
-import TryCatch from "../hooks/TryCatch.js";
+import TryCatch from "../utils/TryCatch.js";
 import type { RequestHandler } from "express";
+import generateJwtToken from "../utils/generateJWT.js";
+import { createUser, findUserByEmail } from "../services/user.service.js";
+import type { IUser } from "../model/User.js";
 
 export const loginUser: RequestHandler = TryCatch(async (req, res) => {
     // Check if Redis client is connected
@@ -29,7 +32,8 @@ export const loginUser: RequestHandler = TryCatch(async (req, res) => {
 
     if (rateLimit) {
         return res.status(429).json({
-            message: "Too many login OTP requests. Please wait 60 seconds before requesting a new OTP!",
+            message:
+                "Too many login OTP requests. Please wait 60 seconds before requesting a new OTP!",
         });
     }
 
@@ -55,9 +59,6 @@ export const loginUser: RequestHandler = TryCatch(async (req, res) => {
     });
 });
 
-
-
-
 export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
     // Check if Redis client is connected
     if (!redisClient.isOpen) {
@@ -81,7 +82,8 @@ export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
 
     if (rateLimit) {
         return res.status(429).json({
-            message: "Too many password reset OTP requests. Please wait 60 seconds before requesting a new OTP!",
+            message:
+                "Too many password reset OTP requests. Please wait 60 seconds before requesting a new OTP!",
         });
     }
 
@@ -104,5 +106,54 @@ export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
 
     return res.status(200).json({
         message: "Password reset OTP sent to your email.",
+    });
+});
+
+export const verifyUser: RequestHandler = TryCatch(async (req, res) => {
+    const { email, otp: enteredOtp } = req.body;
+
+    // Validate input
+    if (!email || !enteredOtp) {
+        return res.status(400).json({
+            message: "Email and OTP are required",
+        });
+    }
+
+    // Check OTP in Redis
+    const otpKey = `otp:login:${email}`;
+    const storedOtp = await redisClient.get(otpKey);
+
+    if (!storedOtp || storedOtp !== enteredOtp) {
+        return res.status(400).json({
+            message: "Invalid or expired OTP",
+        });
+    }
+
+    // Delete OTP from Redis
+    await redisClient.del(otpKey);
+
+    // Find or create user
+    let user: IUser | null = await findUserByEmail(email);
+
+    if (!user) {
+        const name = email.slice(0, 8);
+        user = await createUser(name, email);
+    }
+
+    // Generate JWT token
+    const token = generateJwtToken({
+        id: user._id.toString(),
+        email: user.email,
+    });
+
+    // Return response
+    return res.json({
+        message: "User verified successfully",
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+        },
+        token,
     });
 });

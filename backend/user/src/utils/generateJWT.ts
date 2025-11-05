@@ -25,9 +25,9 @@ function generateJwtToken(user: User): string {
         throw new Error("JWT_SECRET is not defined in environment variables");
     }
 
-    // Sign token with secret and set expiry to 3 days
+    // Sign token with secret and set expiry to 15 days
     const token = jwt.sign(payload, secret, {
-        expiresIn: "3d",
+        expiresIn: "15d",
     });
 
     return token;

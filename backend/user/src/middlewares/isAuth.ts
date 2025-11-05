@@ -24,7 +24,7 @@ export const isAuth = async (
         // Check if header exists and starts with 'Bearer'
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
-                message: "Authorization header missing or invalid",
+                message: "Authorization header missing or invalid!",
             });
         }
 
@@ -32,7 +32,7 @@ export const isAuth = async (
         const token = authHeader.split(" ")[1];
         if (!token) {
             return res.status(401).json({
-                message: "Token missing in Authorization header",
+                message: "Token missing in Authorization header!",
             });
         }
 
@@ -63,7 +63,7 @@ export const isAuth = async (
         }
         if (error instanceof jwt.JsonWebTokenError) {
             return res.status(401).json({
-                message: "Invalid token",
+                message: "Invalid token!",
             });
         }
 

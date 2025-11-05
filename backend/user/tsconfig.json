@@ -17,7 +17,8 @@
         "verbatimModuleSyntax": true,
         "isolatedModules": true,
         "noUncheckedSideEffectImports": true,
-        "moduleDetection": "force"
+        "moduleDetection": "force",
+        "resolveJsonModule": true,
     },
     "include": ["src/**/*"], // Only compile files in src/
     "exclude": ["node_modules", "dist"] // Exclude node_modules and dist/

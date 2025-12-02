@@ -1,0 +1,360 @@
+{
+    "info": {
+        "name": "Chat-App-API-Collection",
+        "description": "Postman collection for testing the Chat App API, focusing on User Management microservice.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+
+    "item": [
+        {
+            "name": "User Management",
+            "type": "http",
+            "description": "Section for User Management APIs",
+            "item": [
+                {
+                    "name": "Auth Flow",
+                    "type": "http",
+                    "description": "Authentication flow endpoints",
+                    "item": [
+                        {
+                            "name": "POST Send Login OTP",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"email\": \"{{email}}\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/login",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "login"]
+                                },
+                                "description": "Login with email (likely initiates OTP flow)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 200) {",
+                                            "    const jsonData = pm.response.json();",
+                                            "    pm.collectionVariables.set('token', jsonData.token); // Assuming response has 'token' field",
+                                            "    pm.test('Login successful', function () {",
+                                            "        pm.expect(jsonData).to.have.property('token');",
+                                            "    });",
+                                            "} else {",
+                                            "    pm.test('Login failed', function () {",
+                                            "        pm.expect(pm.response.code).to.not.be.oneOf([200, 201]);",
+                                            "    });",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Verify OTP & Get JWT",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"email\": \"{{email}}\",\n  \"otp\": \"{{otp}}\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/verify",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "verify"]
+                                },
+                                "description": "Verify user with OTP (for login, registration, or reset)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 200) {",
+                                            "    const jsonData = pm.response.json();",
+                                            "    pm.collectionVariables.set('token', jsonData.token); // Assuming response has 'token' field after verification",
+                                            "    pm.test('Verification successful', function () {",
+                                            "        pm.expect(jsonData).to.have.property('token');",
+                                            "    });",
+                                            "} else {",
+                                            "    pm.test('Verification failed', function () {",
+                                            "        pm.expect(pm.response.code).to.not.be.oneOf([200, 201]);",
+                                            "    });",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Send Password Reset OTP",
+                            "request": {
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"email\": \"{{email}}\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/forgetPassword",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "forgetPassword"]
+                                },
+                                "description": "Request password reset (sends OTP to email)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Forget Password request sent', function () {",
+                                            "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "Profile Management",
+                    "type": "http",
+                    "description": "Profile-related endpoints",
+                    "item": [
+                        {
+                            "name": "GET My Profile",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{token}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/myProfile",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "myProfile"]
+                                },
+                                "description": "Get current user's profile (requires authentication)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "prerequest",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Token is set', function () {",
+                                            "    pm.expect(pm.collectionVariables.get('token')).to.not.be.empty;",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                },
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Profile fetched successfully', function () {",
+                                            "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Update Profile",
+                            "request": {
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{token}}"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Updated Name\"\n}"
+                                },
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/update/userProfile",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "update", "userProfile"]
+                                },
+                                "description": "Update current user's profile (name) (requires authentication)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "prerequest",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Token is set', function () {",
+                                            "    pm.expect(pm.collectionVariables.get('token')).to.not.be.empty;",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                },
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Profile updated successfully', function () {",
+                                            "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "User Lookup",
+                    "type": "http",
+                    "description": "User lookup endpoints",
+                    "item": [
+                        {
+                            "name": "GET All Users",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    },
+                                    {
+                                        "key": "Authorization",
+                                        "value": "Bearer {{token}}"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/users/all",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "users", "all"]
+                                },
+                                "description": "Get all users (requires authentication, likely admin)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "prerequest",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('Token is set', function () {",
+                                            "    pm.expect(pm.collectionVariables.get('token')).to.not.be.empty;",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                },
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('All users fetched successfully', function () {",
+                                            "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "GET User by ID",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{userbaseUrl}}/users/user/{{userId}}",
+                                    "host": ["{{userbaseUrl}}"],
+                                    "path": ["users", "user", "{{userId}}"]
+                                },
+                                "description": "Get user by ID (public endpoint)"
+                            },
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "pm.test('User fetched successfully', function () {",
+                                            "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                                            "});"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+
+    "variable": [
+        {
+            "key": "userbaseUrl",
+            "value": "http://localhost:3000/api/v1",
+            "description": "Base URL for the User Management service"
+        },
+        {
+            "key": "email",
+            "value": "test@example.com",
+            "description": "Test email for login, forget password, and verify"
+        },
+        {
+            "key": "otp",
+            "value": "123456",
+            "description": "Test OTP (6 digits) for verification"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "description": "JWT token for authenticated requests (set via post-response script in login)"
+        },
+        {
+            "key": "userId",
+            "value": "",
+            "description": "User ID for getUserById (set manually after creating a user or from response)"
+        }
+    ]
+}

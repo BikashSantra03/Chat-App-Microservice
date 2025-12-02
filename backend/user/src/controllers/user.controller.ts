@@ -31,7 +31,7 @@ export const loginUser: RequestHandler = TryCatch(async (req, res) => {
 
     if (rateLimit) {
         return res.status(429).json({
-            message:
+            error:
                 "Too many login OTP requests. Please wait 60 seconds before requesting a new OTP!",
         });
     }
@@ -75,7 +75,7 @@ export const forgetPassword: RequestHandler = TryCatch(async (req, res) => {
 
     if (rateLimit) {
         return res.status(429).json({
-            message:
+            error:
                 "Too many password reset OTP requests. Please wait 60 seconds before requesting a new OTP!",
         });
     }
@@ -114,7 +114,7 @@ export const verifyUser: RequestHandler = TryCatch(async (req, res) => {
 
     if (!storedOtp || storedOtp !== enteredOtp) {
         return res.status(400).json({
-            message: "Invalid or expired OTP!",
+            error: "Invalid or expired OTP!",
         });
     }
 
@@ -154,7 +154,7 @@ export const getMyProfile: RequestHandler = TryCatch(
     async (req: AuthRequest, res) => {
         if (!req.user) {
             return res.status(401).json({
-                message: "Not authenticated!",
+                error: "Not authenticated!",
             });
         }
         // Fetch user by ID
@@ -162,7 +162,7 @@ export const getMyProfile: RequestHandler = TryCatch(
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found!",
+                error: "User not found!",
             });
         }
 
@@ -186,7 +186,7 @@ export const updateProfile: RequestHandler = TryCatch(
     async (req: AuthRequest, res) => {
         if (!req.user) {
             return res.status(401).json({
-                message: "Not authenticated!",
+                error: "Not authenticated!",
             });
         }
 
@@ -197,7 +197,7 @@ export const updateProfile: RequestHandler = TryCatch(
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found!",
+                error: "User not found!",
             });
         }
 
@@ -247,7 +247,7 @@ export const getUserById: RequestHandler = TryCatch(async (req, res) => {
 
     if (!id) {
         return res.status(400).json({
-            message: "User ID is required!",
+            error: "User ID is required!",
         });
     }
 
@@ -256,7 +256,7 @@ export const getUserById: RequestHandler = TryCatch(async (req, res) => {
 
     if (!user) {
         return res.status(404).json({
-            message: "User not found!",
+            error: "User not found!",
         });
     }
 

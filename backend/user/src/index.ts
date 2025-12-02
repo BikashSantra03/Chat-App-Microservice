@@ -6,8 +6,6 @@ import userRouter from "./routes/user.route.js";
 import { connectRabbitMQ } from "./config/rabbitmq.js";
 import { connectRedis } from "./config/redis.js";
 import cors from "cors";
-import swaggerUi from "swagger-ui-express";
-// import * as swaggerDocument from "./swagger.json";
 
 dotenv.config();
 
@@ -38,14 +36,12 @@ const corsOptions: cors.CorsOptions = {
 app.use(cors(corsOptions));
 
 // Mount the user router
-app.use("/api/v1", userRouter);
+app.use("/api/v1/users", userRouter);
 
 // Default API route
 app.get("/", (req, res) => {
     res.send("<h1>User Server is up and running 🚀</h1>");
 });
-
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Start server
 async function startServer() {

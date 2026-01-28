@@ -1,4 +1,5 @@
 import amqp from "amqplib";
+import colors from "colors";
 import mailSender from "./mailsender.js";
 
 let channel: amqp.Channel;

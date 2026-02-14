@@ -14,11 +14,10 @@ export const startServer = async () => {
         const PORT = process.env.PORT || 3000;
 
         app.listen(PORT, () => {
-            console.log(`User Server is running on PORT ${PORT} ??`.blue);
+            console.log(`User Server is running on PORT ${PORT} 🚀`.blue);
         });
     } catch (error) {
         console.error("Failed to start User server:".red, error);
         process.exit(1);
     }
 };
-

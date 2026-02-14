@@ -13,7 +13,7 @@ export const startServer = async () => {
         const PORT = process.env.PORT || 3001;
 
         app.listen(PORT, () => {
-            console.log(`Mail Server is running on PORT ${PORT} ??`.blue);
+            console.log(`Mail Server is running on PORT ${PORT} 🚀`.blue);
         });
     } catch (error) {
         console.error("Failed to start Mail server:".red, error);

@@ -18,7 +18,7 @@ export const createApp = (): Express => {
     const corsOptions: cors.CorsOptions = {
         origin: (origin, callback) => {
             if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true); // Allow if origin is whitelisted or absent (e.g., same-origin)
+                callback(null, true); // Allow if origin is whitelisted or absent (e.g., same-origin or non-browser clients like curl/Postman)
                 return;
             }
 
